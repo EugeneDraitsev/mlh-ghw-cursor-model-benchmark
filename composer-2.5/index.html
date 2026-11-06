@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tip Calculator</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --text: #1a1d21;
+      --muted: #5c6570;
+      --border: #e2e6ea;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-muted: rgba(37, 99, 235, 0.12);
+      --shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+      --radius: 12px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f1419;
+      --surface: #1a222d;
+      --text: #eef2f7;
+      --muted: #9aa5b1;
+      --border: #2d3744;
+      --accent: #60a5fa;
+      --accent-hover: #93c5fd;
+      --accent-muted: rgba(96, 165, 250, 0.18);
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 1.25rem;
+      padding-bottom: 2rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.375rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .theme-toggle {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      transform: scale(1.02);
+    }
+
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .theme-toggle svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.375rem;
+      letter-spacing: 0.02em;
+    }
+
+    .field {
+      margin-bottom: 1.25rem;
+    }
+
+    .field:last-of-type {
+      margin-bottom: 0;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem 0.875rem;
+      font: inherit;
+      font-size: 1.0625rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-muted);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+      opacity: 0.75;
+    }
+
+    .tip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .tip-btn {
+      flex: 1;
+      min-width: calc(25% - 0.375rem);
+      padding: 0.5rem 0.35rem;
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+
+    .tip-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tip-btn.active {
+      background: var(--accent-muted);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tip-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .tip-custom-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    .results {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      display: grid;
+      gap: 0.875rem;
+    }
+
+    .result-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result-line span:first-child {
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    .result-line strong {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .result-line.highlight strong {
+      font-size: 1.35rem;
+      color: var(--accent);
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 380px) {
+      .tip-btn {
+        min-width: calc(50% - 0.25rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Tip calculator</h1>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="4" />
+          <path stroke-linecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+        </svg>
+      </button>
+    </header>
+
+    <div class="card">
+      <div class="field">
+        <label for="bill">Bill amount</label>
+        <input type="text" id="bill" inputmode="decimal" autocomplete="transaction-amount" placeholder="0.00" aria-describedby="bill-hint" />
+        <span id="bill-hint" class="visually-hidden" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Enter the total before tip</span>
+      </div>
+
+      <div class="field">
+        <label for="tipPercent">Tip (%)</label>
+        <input type="number" id="tipPercent" inputmode="decimal" min="0" max="100" step="0.5" value="15" placeholder="15" />
+        <div class="tip-row" role="group" aria-label="Quick tip percentages">
+          <button type="button" class="tip-btn" data-tip="10">10%</button>
+          <button type="button" class="tip-btn active" data-tip="15">15%</button>
+          <button type="button" class="tip-btn" data-tip="20">20%</button>
+          <button type="button" class="tip-btn" data-tip="25">25%</button>
+        </div>
+        <p class="tip-custom-note">Or type a custom percentage above.</p>
+      </div>
+
+      <div class="field">
+        <label for="people">Number of people</label>
+        <input type="number" id="people" inputmode="numeric" min="1" step="1" value="1" />
+      </div>
+
+      <div class="results" aria-live="polite">
+        <div class="result-line">
+          <span>Tip amount</span>
+          <strong id="tipAmount">$0.00</strong>
+        </div>
+        <div class="result-line">
+          <span>Total with tip</span>
+          <strong id="totalAmount">$0.00</strong>
+        </div>
+        <div class="result-line highlight">
+          <span>Per person</span>
+          <strong id="perPerson">$0.00</strong>
+        </div>
+      </div>
+    </div>
+
+    <footer>All calculations happen in your browser.</footer>
+  </div>
+
+  <script>
+    (function () {
+      var THEME_KEY = "tip-calc-theme";
+
+      var billEl = document.getElementById("bill");
+      var tipPercentEl = document.getElementById("tipPercent");
+      var peopleEl = document.getElementById("people");
+      var tipAmountEl = document.getElementById("tipAmount");
+      var totalAmountEl = document.getElementById("totalAmount");
+      var perPersonEl = document.getElementById("perPerson");
+      var themeToggle = document.getElementById("themeToggle");
+      var root = document.documentElement;
+      var tipButtons = document.querySelectorAll(".tip-btn");
+
+      function parseBill(raw) {
+        if (!raw || typeof raw !== "string") return NaN;
+        var cleaned = raw.replace(/,/g, "").replace(/^\s+|\s+$/g, "");
+        if (cleaned === "") return NaN;
+        var n = parseFloat(cleaned);
+        return n;
+      }
+
+      function parsePositiveInt(raw, fallback) {
+        var n = parseInt(String(raw), 10);
+        if (!isFinite(n) || n < 1) return fallback;
+        return n;
+      }
+
+      function parseTipPercent(raw) {
+        var n = parseFloat(String(raw));
+        if (!isFinite(n) || n < 0) return 0;
+        if (n > 100) return 100;
+        return n;
+      }
+
+      function formatMoney(amount) {
+        if (!isFinite(amount)) return "$0.00";
+        return new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(amount);
+      }
+
+      function updateTipButtonStates() {
+        var current = parseTipPercent(tipPercentEl.value);
+        tipButtons.forEach(function (btn) {
+          var v = parseFloat(btn.getAttribute("data-tip"));
+          btn.classList.toggle("active", Math.abs(current - v) < 0.001);
+        });
+      }
+
+      function recalc() {
+        var bill = parseBill(billEl.value);
+        var tipPct = parseTipPercent(tipPercentEl.value);
+        var people = parsePositiveInt(peopleEl.value, 1);
+
+        updateTipButtonStates();
+
+        if (!isFinite(bill) || bill < 0) {
+          tipAmountEl.textContent = formatMoney(0);
+          totalAmountEl.textContent = formatMoney(0);
+          perPersonEl.textContent = formatMoney(0);
+          return;
+        }
+
+        var tip = bill * (tipPct / 100);
+        var total = bill + tip;
+        var each = total / people;
+
+        tipAmountEl.textContent = formatMoney(tip);
+        totalAmountEl.textContent = formatMoney(total);
+        perPersonEl.textContent = formatMoney(each);
+      }
+
+      billEl.addEventListener("input", recalc);
+      tipPercentEl.addEventListener("input", recalc);
+      peopleEl.addEventListener("input", recalc);
+
+      tipButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var pct = btn.getAttribute("data-tip");
+          tipPercentEl.value = pct;
+          recalc();
+          tipPercentEl.focus();
+        });
+      });
+
+      function getPreferredTheme() {
+        var stored = localStorage.getItem(THEME_KEY);
+        if (stored === "light" || stored === "dark") return stored;
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+        return "light";
+      }
+
+      function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        localStorage.setItem(THEME_KEY, theme);
+        updateThemeIcon(theme);
+      }
+
+      function updateThemeIcon(theme) {
+        var isDark = theme === "dark";
+        themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+        themeToggle.title = isDark ? "Light mode" : "Dark mode";
+        // Sun in light mode, moon in dark
+        if (isDark) {
+          themeToggle.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+            '<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />' +
+            "</svg>";
+        } else {
+          themeToggle.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+            '<circle cx="12" cy="12" r="4" />' +
+            '<path stroke-linecap="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />' +
+            "</svg>";
+        }
+      }
+
+      themeToggle.addEventListener("click", function () {
+        var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        applyTheme(next);
+      });
+
+      if (window.matchMedia) {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) {
+          if (!localStorage.getItem(THEME_KEY)) applyTheme(e.matches ? "dark" : "light");
+        });
+      }
+
+      applyTheme(getPreferredTheme());
+      recalc();
+    })();
+  </script>
+</body>
+</html>

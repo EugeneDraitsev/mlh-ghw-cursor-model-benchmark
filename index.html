@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cursor model benchmark</title>
+<style>
+  body { margin: 0; padding: 16px; background: #0d1117; color: #e6edf3; font: 14px/1.45 system-ui, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  p { margin: 0 0 14px; color: #9da7b3; max-width: 980px; }
+  a { color: #58a6ff; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .col { background: #161b22; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; }
+  .head { padding: 10px 12px; border-bottom: 1px solid #30363d; }
+  .head b { font-size: 15px; }
+  .meta { color: #9da7b3; font-size: 12px; }
+  iframe { display: block; width: 100%; height: 680px; border: 0; background: #fff; }
+</style>
+</head>
+<body>
+<h1>Same prompt, three Cursor models</h1>
+<p>MLH Global Hack Week: Builders Week, Challenge 2. Each calculator was written by a separate Cursor cloud agent from the same prompt. All three are filled with the same test input: bill 100, tip 20%, 4 people, which should give $20.00 / $120.00 / $30.00. Details in the <a href="https://github.com/EugeneDraitsev/mlh-ghw-cursor-model-benchmark#readme">README</a>.</p>
+<div class="grid">
+  <div class="col"><div class="head"><b>Composer 2.5 Fast</b><div class="meta">438 lines · under a minute</div></div><iframe src="composer-2.5/index.html" title="Composer 2.5"></iframe></div>
+  <div class="col"><div class="head"><b>Grok 4.7 High Fast</b><div class="meta">613 lines · checked at 3 widths</div></div><iframe src="grok-4.7/index.html" title="Grok 4.7"></iframe></div>
+  <div class="col"><div class="head"><b>Grok 4.6 High Fast</b><div class="meta">482 lines · 23/23 browser checks</div></div><iframe src="grok-4.6/index.html" title="Grok 4.6"></iframe></div>
+</div>
+<script>
+  // Fill every calculator with the same test input once it loads.
+  document.querySelectorAll('iframe').forEach(function (ifr) {
+    ifr.addEventListener('load', function () {
+      var d = ifr.contentDocument;
+      var label = function (i) { return ((i.labels && i.labels[0] && i.labels[0].innerText) || i.placeholder || i.id || '').toLowerCase(); };
+      var inputs = Array.prototype.filter.call(d.querySelectorAll('input'), function (i) { return i.type !== 'checkbox' && i.type !== 'radio'; });
+      var set = function (el, v) { if (!el) return; el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); };
+      set(inputs.find(function (i) { return /bill/.test(label(i)); }), '100');
+      var b20 = Array.prototype.find.call(d.querySelectorAll('button'), function (b) { return b.innerText.trim() === '20%'; });
+      if (b20) b20.click();
+      set(inputs.find(function (i) { return /people|person/.test(label(i)); }), '4');
+    });
+  });
+</script>
+</body>
+</html>
