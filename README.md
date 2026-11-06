@@ -24,14 +24,14 @@ Test input: bill 100, tip 20%, 4 people. Expected $20.00 tip, $120.00 total, $30
 
 **Composer 2.5 Fast**
 - Pros: by far the fastest turnaround; compact code; helpful hint text under the inputs; dark mode remembers your choice and follows the system setting.
-- Cons: no testing of its own before committing; fewest extras.
+- Cons: no testing of its own before committing; fewest extras (plain number field for people, no +/− buttons).
 
 **Grok 4.7 High Fast**
-- Pros: the most careful run; it tested live updates, the quick buttons, split math and dark mode, and checked the layout on phone widths; the clearest labels and helper copy.
+- Pros: the most careful run; it tested live updates, the quick buttons, split math and dark mode, and checked the layout on phone widths; the clearest labels and helper copy, plus +/− buttons for the number of people.
 - Cons: the largest file; the slowest of the three.
 
 **Grok 4.6 High Fast**
-- Pros: added +/− steppers for the number of people; wrote and ran 23 browser checks; caught and fixed its own bug (the stepper buttons did not match their CSS selector) and rebased cleanly when `main` moved.
-- Cons: needed a fix-up pass; starts in light mode.
+- Pros: wrote and ran 23 browser checks (live updates, all four tip buttons, custom percent, people steppers, invalid input, dark mode, 390px layout); caught and fixed its own bug (the people +/− buttons did not match their CSS selector) and rebased cleanly when `main` moved.
+- Cons: needed a fix-up pass before it passed its own checks.
 
 **Takeaway:** Composer 2.5 is the pick for quick scaffolding. Grok 4.7 and 4.6 take longer but verify their own work, which matters more as the app grows.
